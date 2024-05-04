@@ -25,34 +25,45 @@ impl Token {
     }
 }
 
-struct Tokenizer {}
+struct Tokenizer {
+    current_line: u32,
+    current_column: u32,
+}
 
 impl Tokenizer {
     fn new() -> Tokenizer {
-        Tokenizer {}
+        Tokenizer {
+            current_line: 0,
+            current_column: 0,
+        }
     }
 
-    fn tokenize(&self, code: String) -> Vec<Token> {
+    fn reset_state(&mut self) {
+        self.current_line = 0;
+        self.current_column = 0;
+    }
+
+    fn tokenize(&mut self, code: String) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
         for (index, line) in code.lines().enumerate() {
             println!("{}", line);
 
-            // calculate line number
-            let line_number: u32 = (index as u32) + 1;
+            self.current_line = (index as u32) + 1;
 
             // Split line with whitespace
             let words: Vec<&str> = line.split_whitespace().collect();
 
             for word in words {
-                let column_number: u32 = line.find(word).unwrap() as u32;
+                // let column_number: u32 = line.find(word).unwrap() as u32;
+                self.current_column = line.find(word).unwrap() as u32;
 
                 // Check if word is a keyword
                 if word == "var" || word == "let" || word == "const" {
                     let token: Token = Token::new(
                         EToken::Keyword(String::from(word)),
-                        line_number,
-                        column_number,
+                        self.current_line,
+                        self.current_column,
                     );
                     tokens.push(token);
                 }
@@ -61,8 +72,8 @@ impl Tokenizer {
                 if word == "x" {
                     let token: Token = Token::new(
                         EToken::Identifier(String::from(word)),
-                        line_number,
-                        column_number,
+                        self.current_line,
+                        self.current_column,
                     );
                     tokens.push(token);
                 }
@@ -71,8 +82,8 @@ impl Tokenizer {
                 if word == "=" || word == "+" || word == "-" || word == "*" || word == "/" {
                     let token: Token = Token::new(
                         EToken::Operator(String::from(word)),
-                        line_number,
-                        column_number,
+                        self.current_line,
+                        self.current_column,
                     );
                     tokens.push(token);
                 }
@@ -81,13 +92,15 @@ impl Tokenizer {
                 if word == "10" {
                     let token = Token::new(
                         EToken::Literal(String::from(word)),
-                        line_number,
-                        column_number,
+                        self.current_line,
+                        self.current_column,
                     );
                     tokens.push(token);
                 }
             }
         }
+
+        self.reset_state();
 
         return tokens;
     }
