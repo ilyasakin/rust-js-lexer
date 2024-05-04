@@ -32,7 +32,7 @@ impl Tokenizer {
         Tokenizer {}
     }
 
-    fn tokenize(&self, code: &str) -> Vec<Token> {
+    fn tokenize(&self, code: String) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
         for (index, line) in code.lines().enumerate() {
@@ -97,7 +97,7 @@ fn main() {
     let contents = std::fs::read_to_string("./src/samples/variable_declaration.js")
         .expect("Something went wrong reading the file");
 
-    let tokens: Vec<Token> = Tokenizer::new().tokenize(&contents);
+    let tokens: Vec<Token> = Tokenizer::new().tokenize(contents);
 
     println!("{:?}", tokens);
 }
