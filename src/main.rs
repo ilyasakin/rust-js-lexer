@@ -54,6 +54,48 @@ impl Tokenizer {
         self.current_cursor_location = 0;
     }
 
+    fn get_token(&self, token: &str) -> EToken {
+        match token {
+            "var" => EToken::Keyword(String::from("var")),
+            "let" => EToken::Keyword(String::from("let")),
+            "const" => EToken::Keyword(String::from("const")),
+            "function" => EToken::Keyword(String::from("function")),
+            "=>" => EToken::Operator(String::from("=>")),
+            "=" => EToken::Operator(String::from("=")),
+            "+" => EToken::Operator(String::from("+")),
+            "-" => EToken::Operator(String::from("-")),
+            "*" => EToken::Operator(String::from("*")),
+            "/" => EToken::Operator(String::from("/")),
+            "%" => EToken::Operator(String::from("%")),
+            "==" => EToken::Operator(String::from("==")),
+            "===" => EToken::Operator(String::from("===")),
+            "!=" => EToken::Operator(String::from("!=")),
+            "!==" => EToken::Operator(String::from("!==")),
+            ">" => EToken::Operator(String::from(">")),
+            "<" => EToken::Operator(String::from("<")),
+            ">=" => EToken::Operator(String::from(">=")),
+            "<=" => EToken::Operator(String::from("<=")),
+            "&&" => EToken::Operator(String::from("&&")),
+            "||" => EToken::Operator(String::from("||")),
+            "!" => EToken::Operator(String::from("!")),
+            "&" => EToken::Operator(String::from("&")),
+            "|" => EToken::Operator(String::from("|")),
+            "^" => EToken::Operator(String::from("^")),
+            "~" => EToken::Operator(String::from("~")),
+            "<<" => EToken::Operator(String::from("<<")),
+            ">>" => EToken::Operator(String::from(">>")),
+            ">>>" => EToken::Operator(String::from(">>>")),
+            "++" => EToken::Operator(String::from("++")),
+            "--" => EToken::Operator(String::from("--")),
+            "in" => EToken::Operator(String::from("in")),
+            "instanceof" => EToken::Operator(String::from("instanceof")),
+            "typeof" => EToken::Operator(String::from("typeof")),
+            "void" => EToken::Operator(String::from("void")),
+            "delete" => EToken::Operator(String::from("delete")),
+            _ => EToken::Identifier(String::from(token)),
+        }
+    }
+
     fn tokenize(&mut self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
@@ -64,7 +106,7 @@ impl Tokenizer {
             for (column_index, character) in line.chars().enumerate() {
                 self.current_cursor_location = column_index as u32;
 
-                if character.is_alphabetic() {
+                if !character.is_whitespace() {
                     current_token.push(character);
                     println!("Current Token: {}", current_token);
                 } else {
@@ -75,7 +117,7 @@ impl Tokenizer {
                         let built_token_string = current_token.clone();
 
                         tokens.push(Token::new(
-                            EToken::Identifier(built_token_string),
+                            self.get_token(&built_token_string),
                             self.current_line_number,
                             self.current_cursor_location - current_token_length,
                             self.current_cursor_location,
