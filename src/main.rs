@@ -96,6 +96,15 @@ impl Tokenizer {
         }
     }
 
+    fn get_is_next_char_punctuator(&self, line: &str, cursor_location: u32) -> bool {
+        let next_char = line.chars().nth(cursor_location as usize + 1);
+
+        match next_char {
+            Some(character) => character == ';',
+            None => false,
+        }
+    }
+
     fn tokenize(&mut self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
@@ -106,7 +115,9 @@ impl Tokenizer {
             for (column_index, character) in line.chars().enumerate() {
                 self.current_cursor_location = column_index as u32;
 
-                if !character.is_whitespace() {
+                if !character.is_whitespace()
+                    || self.get_is_next_char_punctuator(line, self.current_cursor_location)
+                {
                     current_token.push(character);
                     println!("Current Token: {}", current_token);
                 } else {
