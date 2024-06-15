@@ -65,6 +65,11 @@ impl Tokenizer {
     fn get_is_next_char_punctuator(&self, line: &str, cursor_location: u32) -> bool {
         let next_char = line.chars().nth(cursor_location as usize + 1);
 
+        // Print the next character if it is a semicolon.
+        if !next_char.is_none() && next_char.unwrap() == ';' {
+            println!("Next Character: ;");
+        }
+
         match next_char {
             Some(character) => character == ';',
             None => false,
@@ -81,10 +86,18 @@ impl Tokenizer {
             for (column_index, character) in line.chars().enumerate() {
                 self.current_cursor_location = column_index as u32;
 
-                if !character.is_whitespace()
-                    || self.get_is_next_char_punctuator(line, self.current_cursor_location)
-                {
-                    current_token.push(character);
+                if !character.is_whitespace() {
+                    if character == ';' {
+                        tokens.push(Token::new(
+                            EToken::Punctuator(String::from(";")),
+                            self.current_line_number,
+                            self.current_cursor_location,
+                            self.current_cursor_location + 1,
+                        ));
+                    } else {
+                        current_token.push(character);
+                    }
+
                     println!("Current Token: {}", current_token);
                 } else {
                     let current_token_length = current_token.len() as u32;
