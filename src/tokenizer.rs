@@ -21,6 +21,7 @@ impl Tokenizer {
     }
 
     fn get_token(&self, token: &str) -> EToken {
+        println!("Getting Token: {}", token);
         match token {
             "var" => EToken::Keyword(String::from("var")),
             "let" => EToken::Keyword(String::from("let")),
@@ -58,21 +59,8 @@ impl Tokenizer {
             "typeof" => EToken::Operator(String::from("typeof")),
             "void" => EToken::Operator(String::from("void")),
             "delete" => EToken::Operator(String::from("delete")),
+            ";" => EToken::Punctuator(String::from(";")),
             _ => EToken::Identifier(String::from(token)),
-        }
-    }
-
-    fn get_is_next_char_punctuator(&self, line: &str, cursor_location: u32) -> bool {
-        let next_char = line.chars().nth(cursor_location as usize + 1);
-
-        // Print the next character if it is a semicolon.
-        if !next_char.is_none() && next_char.unwrap() == ';' {
-            println!("Next Character: ;");
-        }
-
-        match next_char {
-            Some(character) => character == ';',
-            None => false,
         }
     }
 
@@ -86,14 +74,28 @@ impl Tokenizer {
             for (column_index, character) in line.chars().enumerate() {
                 self.current_cursor_location = column_index as u32;
 
+                let is_last_character = column_index == line.len() - 1;
+                let is_next_char_semicolon =
+                    line.chars().nth(column_index + 1).unwrap_or(' ') == ';';
+
                 if !character.is_whitespace() {
-                    if character == ';' {
-                        tokens.push(Token::new(
-                            EToken::Punctuator(String::from(";")),
-                            self.current_line_number,
-                            self.current_cursor_location,
-                            self.current_cursor_location + 1,
-                        ));
+                    if is_last_character || is_next_char_semicolon {
+                        current_token.push(character);
+                        let current_token_length = current_token.len() as u32;
+
+                        if !current_token.is_empty() {
+                            // TODO: Probably not the best way to circumvent the borrow checker.
+                            let built_token_string = current_token.clone();
+
+                            tokens.push(Token::new(
+                                self.get_token(&built_token_string),
+                                self.current_line_number,
+                                self.current_cursor_location - current_token_length,
+                                self.current_cursor_location,
+                            ));
+
+                            current_token.clear();
+                        }
                     } else {
                         current_token.push(character);
                     }
@@ -122,5 +124,19 @@ impl Tokenizer {
         self.reset_state();
 
         return tokens;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tokenizer() {
+        let code = String::from("var x = 10;");
+        let mut tokenizer = Tokenizer::new(code);
+        let tokens = tokenizer.tokenize();
+
+        assert_eq!(tokens.len(), 5);
     }
 }
