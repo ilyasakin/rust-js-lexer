@@ -20,8 +20,21 @@ impl Tokenizer {
         self.current_cursor_location = 0;
     }
 
+    fn determine_token(&self, token: &str) -> EToken {
+        if token.chars().all(char::is_alphabetic) {
+            return EToken::Identifier(String::from(token));
+        }
+
+        if token.chars().all(char::is_numeric) {
+            return EToken::Literal(String::from(token));
+        }
+
+        return EToken::Identifier(String::from(token));
+    }
+
     fn get_token(&self, token: &str) -> EToken {
         println!("Getting Token: {}", token);
+
         match token {
             "var" => EToken::Keyword(String::from("var")),
             "let" => EToken::Keyword(String::from("let")),
@@ -60,7 +73,7 @@ impl Tokenizer {
             "void" => EToken::Operator(String::from("void")),
             "delete" => EToken::Operator(String::from("delete")),
             ";" => EToken::Punctuator(String::from(";")),
-            _ => EToken::Identifier(String::from(token)),
+            _ => self.determine_token(token),
         }
     }
 
