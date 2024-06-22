@@ -132,11 +132,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_tokenizer() {
+    fn generates_correct_amount_of_tokens() {
         let code = String::from("var x = 10;");
         let mut tokenizer = Tokenizer::new(code);
         let tokens = tokenizer.tokenize();
 
         assert_eq!(tokens.len(), 5);
+    }
+
+    #[test]
+    fn generates_correct_tokens() {
+        let code = String::from("var x = 10;");
+        let mut tokenizer = Tokenizer::new(code);
+        let tokens = tokenizer.tokenize();
+
+        let correct_tokens = vec![
+            Token::new(EToken::Keyword(String::from("var")), 0, 0, 2),
+            Token::new(EToken::Identifier(String::from("x")), 0, 4, 4),
+            Token::new(EToken::Operator(String::from("=")), 0, 6, 6),
+            Token::new(EToken::Literal(String::from("10")), 0, 8, 9),
+            Token::new(EToken::Punctuator(String::from(";")), 0, 9, 9),
+        ];
+
+        for (index, token) in tokens.iter().enumerate() {
+            let correct_token = &correct_tokens.get(index);
+            assert!(correct_token.is_some());
+            assert_eq!(token.token, correct_token.unwrap().token);
+        }
     }
 }

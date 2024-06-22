@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum EToken {
     Identifier(String),
     Keyword(String),
@@ -7,12 +7,12 @@ pub enum EToken {
     Literal(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Token {
-    token: EToken,
-    line_number: u32,
-    column_start_number: u32,
-    column_end_number: u32,
+    pub token: EToken,
+    pub line_number: u32,
+    pub column_start_number: u32,
+    pub column_end_number: u32,
 }
 
 impl Token {
