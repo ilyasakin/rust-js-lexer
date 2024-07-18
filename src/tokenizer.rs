@@ -173,4 +173,37 @@ mod tests {
             assert_eq!(token.token, correct_token.unwrap().token);
         }
     }
+
+    #[test]
+    fn generates_correct_tokens_from_variable_decleration_file() {
+        let contents: String = std::fs::read_to_string("./src/samples/variable_declaration.js")
+            .expect("Something went wrong reading the file");
+
+        let mut tokenizer = Tokenizer::new(contents);
+        let tokens = tokenizer.tokenize();
+
+        let correct_tokens = vec![
+            Token::new(EToken::Keyword(String::from("const")), 0, 0, 2),
+            Token::new(EToken::Identifier(String::from("x")), 0, 4, 4),
+            Token::new(EToken::Operator(String::from("=")), 0, 6, 6),
+            Token::new(EToken::Literal(String::from("10")), 0, 8, 9),
+            Token::new(EToken::Punctuator(String::from(";")), 0, 9, 9),
+            Token::new(EToken::Keyword(String::from("var")), 1, 0, 2),
+            Token::new(EToken::Identifier(String::from("y")), 1, 4, 4),
+            Token::new(EToken::Operator(String::from("=")), 1, 6, 6),
+            Token::new(EToken::Literal(String::from("20")), 1, 8, 9),
+            Token::new(EToken::Punctuator(String::from(";")), 1, 9, 9),
+            Token::new(EToken::Keyword(String::from("let")), 2, 0, 4),
+            Token::new(EToken::Identifier(String::from("z")), 2, 6, 6),
+            Token::new(EToken::Operator(String::from("=")), 2, 8, 8),
+            Token::new(EToken::Literal(String::from("30")), 2, 10, 11),
+            Token::new(EToken::Punctuator(String::from(";")), 2, 11, 11),
+        ];
+
+        for (index, token) in tokens.iter().enumerate() {
+            let correct_token = &correct_tokens.get(index);
+            assert!(correct_token.is_some());
+            assert_eq!(token.token, correct_token.unwrap().token);
+        }
+    }
 }
